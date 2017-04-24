@@ -74,8 +74,8 @@ static int pwm_ir_tx_config(struct pwm_ir_dev *dev, u32 carrier, u32 duty_cycle)
 {
 	int period_ns, duty_ns, rc;
 
-	period_ns = NSEC_PER_SEC / carrier;
-	duty_ns = period_ns * duty_cycle / 100;
+	period_ns = NSEC_PER_SEC / carrier;//周期
+	duty_ns = period_ns * duty_cycle / 100;//占空比
 	printk("pwm_ir_tx_config period_ns = %d,duty_ns = %d \n",period_ns,duty_ns);
 	rc = pwm_config(dev->pwm, duty_ns, period_ns);
 	if (rc == 0) {
