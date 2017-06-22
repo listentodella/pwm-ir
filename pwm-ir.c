@@ -69,7 +69,12 @@ struct pwm_ir_dev *g_ir_dev = NULL;
 #define __devinit 
 #define __devexit_p
 
-/* code for ir transmit */
+/*
+ *code for ir transmit
+ *收发信机transceiver，是transmitter和receiver的复合词，缩略语为TRX。
+ *把TRX拆开，TX表示发射，RX表示接收。
+ *至于为什么是X，大概是英语里的缩写吧，例如Christmas可缩写为X'mas。
+*/
 static int pwm_ir_tx_config(struct pwm_ir_dev *dev, u32 carrier, u32 duty_cycle)
 {
 	int period_ns, duty_ns, rc;
@@ -296,7 +301,7 @@ static int __devinit pwm_ir_tx_probe(struct pwm_ir_dev *dev)
 	int rc = 0;
 
 	if (data->reg_id) {
-		dev->reg = regulator_get(&dev->pdev->dev, data->reg_id);	
+		dev->reg = regulator_get(&dev->pdev->dev, data->reg_id);	//regulator->指电流、电压的稳定器，即稳压或者稳流
 		if (IS_ERR(dev->reg)) {
 			dev_err(&dev->pdev->dev,
 				"failed to regulator_get(%s)\n",
