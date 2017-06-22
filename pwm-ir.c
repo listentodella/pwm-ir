@@ -115,14 +115,14 @@ static int pwm_ir_tx_duty_cycle(struct rc_dev *rdev, u32 duty_cycle)
 	return rc;
 }
 
-static enum hrtimer_restart pwm_ir_tx_timer(struct hrtimer *timer)
+static enum hrtimer_restart pwm_ir_tx_timer(struct hrtimer *timer)//重启高精度定时器->用于发送的定时器
 {
-	struct pwm_ir_packet *pkt = container_of(timer, struct pwm_ir_packet, timer);
+	struct pwm_ir_packet *pkt = container_of(timer, struct pwm_ir_packet, timer);//container_of(),根据已知的成员，获取结构体首地址
 	enum hrtimer_restart restart = HRTIMER_RESTART;
 
 	if (!pkt->abort && pkt->next < pkt->length) {
 		u64 orun = hrtimer_forward_now(&pkt->timer,
-			ns_to_ktime(pkt->buffer[pkt->next++]));
+			ns_to_ktime(pkt->buffer[pkt->next++]));//用于推后定时器的到期时间
 		if (orun > 1)
 			pr_warn("pwm-ir: lost %llu hrtimer callback\n", orun - 1);
 
@@ -142,13 +142,13 @@ static enum hrtimer_restart pwm_ir_tx_timer(struct hrtimer *timer)
 static int pwm_ir_tx_transmit_with_timer(struct pwm_ir_packet *pkt)
 {
 	int rc = 0;
+	//完成量的初始化--》完成量类似于信号量等同步机制
+	init_completion(&pkt->done);//指示等待的事件是否完成。初始化时为0。如果为0，则表示等待的事件未完成。大于0表示等待的事件已经完成。
 
-	init_completion(&pkt->done);
-
-	hrtimer_init(&pkt->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+	hrtimer_init(&pkt->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);//高精度定时器初始化
 	pkt->timer.function = pwm_ir_tx_timer;
 
-	hrtimer_start(&pkt->timer, ns_to_ktime(0), HRTIMER_MODE_REL);
+	hrtimer_start(&pkt->timer, ns_to_ktime(0), HRTIMER_MODE_REL);//启动高精度定时器
 
 	rc = wait_for_completion_interruptible(&pkt->done);
 	if (rc != 0) { /* signal exit immediately */
@@ -167,7 +167,7 @@ static long pwm_ir_tx_work(void *arg)
 //	struct timeval timep, timep2;
  //	printk("wangfajie: entry pwm_ir_tx_work normal mode\n");
 	/* disable irq for acurracy timing */
-	local_irq_save(flags);
+	local_irq_save(flags);//保存中断
 /*
 	for (; pkt->next < pkt->length; pkt->next++) {
 		if (signal_pending(current))
@@ -199,7 +199,7 @@ static long pwm_ir_tx_work(void *arg)
 //	qpnp_ir_pwm_config();
 	rc = qpnp_ir_pwm_data(arg);
 	
-	local_irq_restore(flags);
+	local_irq_restore(flags);//恢复中断
 	
 	return rc;
 }
@@ -208,7 +208,8 @@ static long pwm_ir_tx_work(void *arg)
 static int pwm_ir_tx_transmit_with_delay(struct pwm_ir_packet *pkt)
 {
 	int cpu, rc = -ENODEV;
-
+	/*cpu操作函数*/
+	/*auxilliary->辅助的，备用的*/
 	for_each_online_cpu(cpu) {
 	/* select one auxilliary cpu to run */
 		if (cpu != 0) {
