@@ -91,7 +91,7 @@ static int pwm_ir_tx_config(struct pwm_ir_dev *dev, u32 carrier, u32 duty_cycle)
 	return rc;
 }
 
-static int pwm_ir_tx_carrier(struct rc_dev *rdev, u32 carrier)
+static int pwm_ir_tx_carrier(struct rc_dev *rdev, u32 carrier)//额外单独设置总的周期
 {
 	struct pwm_ir_dev *dev = rdev->priv;
 	int rc;
@@ -103,7 +103,7 @@ static int pwm_ir_tx_carrier(struct rc_dev *rdev, u32 carrier)
 	return rc;
 }
 
-static int pwm_ir_tx_duty_cycle(struct rc_dev *rdev, u32 duty_cycle)
+static int pwm_ir_tx_duty_cycle(struct rc_dev *rdev, u32 duty_cycle)//额外单独设置占空比
 {
 	struct pwm_ir_dev *dev = rdev->priv;
 	int rc;
@@ -383,7 +383,7 @@ static ssize_t lct_ir_debug_proc_write(struct file *file, const char __user *buf
 	char data[256] = {0};
 	char tmp_data[256] = {0};
 	char *operation = NULL;
-	char* value = NULL;
+	char *value = NULL;
 	char *tmpValue1 = NULL;
 	char *tmpValue2 = NULL;
 	int time[256] = {0};
@@ -392,14 +392,11 @@ static ssize_t lct_ir_debug_proc_write(struct file *file, const char __user *buf
 	int duty_percent = 0; 
 	int rc;
 	
-	if(copy_from_user(tmp_data, buf, size))
-    {
-        printk("copy_from_user() fail.\n");
-        return -EFAULT;
-    }
-
-	if(g_ir_dev == NULL)
-	{
+	if(copy_from_user(tmp_data, buf, size)) {
+        	printk("copy_from_user() fail.\n");
+        	return -EFAULT;
+    	}
+	if(g_ir_dev == NULL) {
 		printk("lct_ir_debug_proc_write Please check probe func \n");
 		return -EFAULT;
 	}
@@ -407,8 +404,7 @@ static ssize_t lct_ir_debug_proc_write(struct file *file, const char __user *buf
 	 
 	 strcpy(data,tmp_data);
 	 value = strchr(tmp_data,':');
-	 if(value != NULL)
-	 {
+	 if(value != NULL) {
 	 	data[value-tmp_data] = '\0';
 		operation = data;
 		value++;
